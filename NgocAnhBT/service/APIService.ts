@@ -2,7 +2,7 @@
 // import axios, { AxiosResponse } from 'axios';
 // import apiClient from './apiClient';
 
-// const API_URL = "http://192.168.1.243:8080/api"; // đổi IP theo máy bạn
+// const API_URL = "http://172.20.10.3:8080/api"; // đổi IP theo máy bạn
 
 // async function getToken() {
 //   return await AsyncStorage.getItem('jwt-token');
@@ -72,14 +72,14 @@
 //   return res.data.content;
 // }
 
-// // Lấy sản phẩm theo danh mục
-// export async function GET_PRODUCTS_BY_CATEGORY(categoryId: number) {
-//   const res = await callApi(
-//     `/public/categories/${categoryId}/products?pageNumber=0&pageSize=50&sortBy=productId&sortOrder=asc`,
-//     'GET'
-//   );
-//   return res.data;
-// }
+// Lấy sản phẩm theo danh mục
+export async function GET_PRODUCTS_BY_CATEGORY(categoryId: number) {
+  const res = await callApi(
+    `/public/categories/${categoryId}/products?pageNumber=0&pageSize=50&sortBy=productId&sortOrder=asc`,
+    'GET'
+  );
+  return res.data;
+}
 
 // // Lấy chi tiết sản phẩm
 // export async function GET_PRODUCT_DETAIL(productId: number) {
@@ -133,35 +133,35 @@
 //   }
 // }
 
-// // TÌM KIẾM SẢN PHẨM THEO TỪ KHÓA VỚI CATEGORY ID
-// export async function GET_PRODUCTS_BY_KEYWORD(
-//   keyword: string,
-//   page: number = 0, 
-//   size: number = 10, 
-//   categoryId: number = 0
-// ) {
-//     const endpoint = `/public/products/keyword/${encodeURIComponent(keyword)}` + 
-//                    `?pageNumber=${page}` +
-//                    `&pageSize=${size}` +
-//                    `&sortBy=productId` +
-//                    `&sortOrder=asc` +
-//                    `&categoryId=${categoryId}`;
+// TÌM KIẾM SẢN PHẨM THEO TỪ KHÓA VỚI CATEGORY ID
+export async function GET_PRODUCTS_BY_KEYWORD(
+  keyword: string,
+  page: number = 0, 
+  size: number = 10, 
+  categoryId: number = 0
+) {
+    const endpoint = `/public/products/keyword/${encodeURIComponent(keyword)}` + 
+                   `?pageNumber=${page}` +
+                   `&pageSize=${size}` +
+                   `&sortBy=productId` +
+                   `&sortOrder=asc` +
+                   `&categoryId=${categoryId}`;
 
-//   const res = await callApi(endpoint, 'GET');
-//   return res.data; 
+  const res = await callApi(endpoint, 'GET');
+  return res.data; 
+}
+// export async function SEARCH_PRODUCTS(
+//   keyword: string,
+//   page = 0,
+//   size = 10,
+//   categoryId = 9
+// ) {
+//   const res = await callApi(
+//     `/products/search?keyword=${encodeURIComponent(keyword)}&pageNumber=${page}&pageSize=${size}&categoryId=${categoryId}`,
+//     'GET'
+//   );
+//   return res.data;
 // }
-// // export async function SEARCH_PRODUCTS(
-// //   keyword: string,
-// //   page = 0,
-// //   size = 10,
-// //   categoryId = 9
-// // ) {
-// //   const res = await callApi(
-// //     `/products/search?keyword=${encodeURIComponent(keyword)}&pageNumber=${page}&pageSize=${size}&categoryId=${categoryId}`,
-// //     'GET'
-// //   );
-// //   return res.data;
-// // }
 
 // // ĐẶT HÀNG
 // export const placeOrderApi = async (
@@ -220,7 +220,7 @@
 // export async function CREATE_VNPAY_PAYMENT(amount: string | number) {
 //   try {
 //     // Truyền amount lên server để tạo hóa đơn đúng số tiền
-//     const res = await axios.get(`http://192.168.1.243:3000/payment?amount=${amount}`);
+//     const res = await axios.get(`http://172.20.10.3:3000/payment?amount=${amount}`);
 //     console.log('VNPay response:', res.data);
 //     return res.data;   // Kỳ vọng trả về { url: "..." }
 //   } catch (error: any) {
@@ -324,7 +324,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios, { AxiosResponse } from 'axios';
 import apiClient from './apiClient';
 
-const API_URL = "http://192.168.1.243:8080/api"; 
+const API_URL = "http://172.20.10.3:8080/api"; 
 
 async function getToken() {
   return await AsyncStorage.getItem('jwt-token');
@@ -474,7 +474,7 @@ export async function GET_ORDER_DETAILS(email: string, orderId: string) {
 // ==========================================
 
 export async function CREATE_VNPAY_PAYMENT(amount: string | number) {
-  const res = await axios.get(`http://192.168.1.243:3000/payment?amount=${amount}`);
+  const res = await axios.get(`http://172.20.10.3:3000/payment?amount=${amount}`);
   return res.data;
 }
 

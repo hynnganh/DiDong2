@@ -2,219 +2,143 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import {
-    ActivityIndicator,
-    Alert,
-    DeviceEventEmitter,
-    FlatList,
-    Image,
-    Keyboard,
-    KeyboardAvoidingView,
-    Platform,
-    SafeAreaView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
+    ActivityIndicator, Alert, DeviceEventEmitter, FlatList, Image,
+    KeyboardAvoidingView, Platform, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View
 } from 'react-native';
 import { ASK_GEMINI_AI } from '../../service/APIService';
 import { getCartIdFromToken } from "../../service/UserService";
 import { IMAGE_API } from "../../service/apiClient";
 
-interface Product {
-    id: string;
-    name: string;
-    price: string;
-    image: string;
-}
-
 interface Message {
     id: string;
     text: string;
     sender: 'user' | 'ai';
-    product?: Product;
+    suggested_products?: any[];
 }
 
 export default function GeminiChatScreen() {
     const router = useRouter();
     const [messages, setMessages] = useState<Message[]>([
-        { 
-            id: '1', 
-            text: 'Chào bạn! ✨ Mình là trợ lý AI của Ngọc Anh Beauty. bạn cần tìm mỹ phẩm hay muốn thêm món nào vào giỏ cứ bảo mình nhé!', 
-            sender: 'ai' 
-        }
+        { id: '1', text: 'Chào bạn! ✨ Mình là trợ lý AI của Ngọc Anh Beauty. Bạn cần tìm sản phẩm gì cứ bảo mình nhé!', sender: 'ai' }
     ]);
     const [inputText, setInputText] = useState('');
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(false); // Sửa False thành false
     const flatListRef = useRef<FlatList>(null);
 
-    // Tự động cuộn xuống khi có tin nhắn mới
     useEffect(() => {
-        if (messages.length > 0) {
-            flatListRef.current?.scrollToEnd({ animated: true });
-        }
+        setTimeout(() => {
+            flatListRef.current?.scrollToEnd({ animated: true }); // Sửa True thành true
+        }, 100);
     }, [messages, loading]);
 
     const handleSendMessage = async () => {
         if (!inputText.trim() || loading) return;
 
         const userMsg = inputText.trim();
-        const userMsgId = Date.now().toString();
-
-        setMessages(prev => [...prev, { id: userMsgId, text: userMsg, sender: 'user' }]);
+        setMessages(prev => [...prev, { id: Date.now().toString(), text: userMsg, sender: 'user' }]);
         setInputText('');
-        setLoading(true);
-        Keyboard.dismiss();
+        setLoading(true); // Sửa True thành true
 
         try {
-            // 1. Lấy Cart ID từ hệ thống
             const cid = await getCartIdFromToken();
-            
             if (!cid) {
                 setLoading(false);
-                Alert.alert("Thông báo", "bạn vui lòng đăng nhập để AI hỗ trợ tốt nhất nhé!");
-                return;
+                return Alert.alert("Thông báo", "Bạn vui lòng đăng nhập để mình hỗ trợ tốt nhất nhé!");
             }
 
-            // 2. Gọi API Server Python
             const data = await ASK_GEMINI_AI(userMsg, cid);
 
-            // 3. Cập nhật tin nhắn từ AI
-            const aiMsgId = (Date.now() + 1).toString();
             setMessages(prev => [...prev, { 
-                id: aiMsgId, 
+                id: (Date.now() + 1).toString(), 
                 text: data.reply, 
                 sender: 'ai',
-                product: data.product_data ? {
-                    id: data.product_data.productId,
-                    name: data.product_data.productName,
-                    price: (data.product_data.specialPrice ?? data.product_data.price)?.toLocaleString(),
-                    image: data.product_data.image 
-                } : undefined
+                // Quan trọng: Gán mảng sản phẩm từ API vào đây
+                suggested_products: data.suggested_products || [] 
             }]);
 
-            // 4. Nếu AI báo đã thêm vào giỏ -> Phát tín hiệu cho trang MyCart load lại
-            if (data.added_product_id) {
-                DeviceEventEmitter.emit("CartUpdated");
-                // Optional: Alert.alert("Thành công", "Đã thêm vào giỏ hàng!");
-            }
+            if (data.added_product_id) DeviceEventEmitter.emit("CartUpdated");
 
         } catch (error) {
-            console.error("Chat Error:", error);
-            setMessages(prev => [...prev, { 
-                id: 'err', 
-                text: 'Hic, đường truyền mỹ phẩm đang bận chút. bạn thử lại sau nhé! 😢', 
-                sender: 'ai' 
-            }]);
+            setMessages(prev => [...prev, { id: 'err', text: 'Kết nối đang bận, bạn thử lại sau nhé! 😢', sender: 'ai' }]);
         } finally {
-            setLoading(false);
+            setLoading(false); // Sửa False thành false
         }
     };
 
     const renderItem = ({ item }: { item: Message }) => (
-        <View style={[
-            styles.bubbleContainer, 
-            item.sender === 'user' ? { alignItems: 'flex-end' } : { alignItems: 'flex-start' }
-        ]}>
-            {/* Tin nhắn văn bản */}
-            <View style={[
-                styles.bubble, 
-                item.sender === 'user' ? styles.userBubble : styles.aiBubble
-            ]}>
-                <Text style={[
-                    styles.bubbleText,
-                    { color: item.sender === 'user' ? '#FFF' : '#333' }
-                ]}>
+        <View style={[styles.bubbleContainer, item.sender === 'user' ? { alignItems: 'flex-end' } : { alignItems: 'flex-start' }]}>
+            <View style={[styles.bubble, item.sender === 'user' ? styles.userBubble : styles.aiBubble]}>
+                <Text style={[styles.bubbleText, { color: item.sender === 'user' ? '#FFF' : '#333' }]}>
                     {item.text}
                 </Text>
             </View>
 
-            {/* CARD SẢN PHẨM GỢI Ý - CÓ THỂ TÍCH VÀO XEM CHI TIẾT */}
-            {item.product && (
-                <TouchableOpacity 
-                    activeOpacity={0.9}
-                    style={styles.productCard}
-                    onPress={() => router.push({ 
-                        pathname: "/productdetail", 
-                        params: { id: item.product?.id } 
-                    })}
-                >
-                    <View style={styles.imageWrapper}>
-                        <Image 
-                            source={{ uri: IMAGE_API + item.product.image }} 
-                            style={styles.productImage} 
-                        />
-                        <View style={styles.badge}>
-                            <Text style={styles.badgeText}>Gợi ý cho bạn</Text>
-                        </View>
-                    </View>
-                    
-                    <View style={styles.productInfo}>
-                        <Text style={styles.productName} numberOfLines={1}>
-                            {item.product.name}
-                        </Text>
-                        <Text style={styles.productPrice}>{item.product.price} đ</Text>
-                        
-                        <View style={styles.detailBtn}>
-                            <Text style={styles.detailBtnText}>Xem chi tiết</Text>
-                            <Ionicons name="chevron-forward" size={14} color="#FF8FA3" />
-                        </View>
-                    </View>
-                </TouchableOpacity>
+            {/* Hiển thị Card sản phẩm nếu có mảng gợi ý */}
+            {item.suggested_products && item.suggested_products.length > 0 && (
+                <View style={{ width: '100%', height: 210 }}>
+                    <FlatList
+                        horizontal
+                        data={item.suggested_products}
+                        keyExtractor={(p, index) => p.productId?.toString() || index.toString()}
+                        showsHorizontalScrollIndicator={false} // Sửa False thành false
+                        contentContainerStyle={{ paddingLeft: 10, paddingVertical: 10 }}
+                        renderItem={({ item: prod }) => (
+                            <TouchableOpacity 
+                                activeOpacity={0.8}
+                                style={styles.productCard} 
+                                onPress={() => router.push({ pathname: "/productdetail", params: { id: prod.productId } })}
+                            >
+                                <Image source={{ uri: IMAGE_API + prod.image }} style={styles.productImage} />
+                                <View style={styles.productInfo}>
+                                    <Text numberOfLines={1} style={styles.productName}>{prod.productName}</Text>
+                                    <Text style={styles.productPrice}>{prod.price?.toLocaleString()}đ</Text>
+                                </View>
+                            </TouchableOpacity>
+                        )}
+                    />
+                </View>
             )}
         </View>
     );
 
     return (
         <SafeAreaView style={styles.container}>
-            {/* Header */}
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
                     <Ionicons name="chevron-back" size={24} color="white" />
                 </TouchableOpacity>
-                <View style={styles.headerTitleRow}>
-                    <Ionicons name="sparkles" size={18} color="white" />
-                    <Text style={styles.headerTitle}>Ngọc Anh Beauty AI</Text>
-                </View>
-                <View style={{ width: 40 }} /> 
+                <Text style={styles.headerTitle}>Ngọc Anh Beauty AI</Text>
+                <View style={{ width: 40 }} />
             </View>
 
-            {/* Danh sách tin nhắn */}
             <FlatList
                 ref={flatListRef}
                 data={messages}
-                keyExtractor={(item) => item.id}
                 renderItem={renderItem}
-                contentContainerStyle={styles.listContent}
-                showsVerticalScrollIndicator={false}
+                keyExtractor={m => m.id}
+                contentContainerStyle={{ padding: 15 }}
+                showsVerticalScrollIndicator={false} // Sửa False thành false
             />
 
-            {/* Trạng thái AI đang xử lý */}
             {loading && (
                 <View style={styles.loadingContainer}>
                     <ActivityIndicator color="#FF8FA3" size="small" />
-                    <Text style={styles.loadingText}>AI đang tìm báu vật...</Text>
+                    <Text style={styles.loadingText}>Đang kiểm tra kho sản phẩm...</Text>
                 </View>
             )}
 
-            {/* Ô nhập liệu */}
-            <KeyboardAvoidingView 
-                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-                keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
-            >
+            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={90}>
                 <View style={styles.inputArea}>
                     <TextInput 
                         style={styles.input} 
-                        placeholder="bạn muốn tìm gì hôm nay?" 
                         value={inputText} 
-                        onChangeText={setInputText}
-                        placeholderTextColor="#A0A0A0"
+                        onChangeText={setInputText} 
+                        placeholder="Nhập tin nhắn..." 
+                        returnKeyType="send"
+                        onSubmitEditing={handleSendMessage}
+                        blurOnSubmit={false}
                     />
-                    <TouchableOpacity 
-                        onPress={handleSendMessage} 
-                        style={[styles.sendBtn, !inputText.trim() && { opacity: 0.6 }]}
-                        disabled={!inputText.trim() || loading}
-                    >
+                    <TouchableOpacity onPress={handleSendMessage} style={styles.sendBtn}>
                         <Ionicons name="send" size={18} color="white" />
                     </TouchableOpacity>
                 </View>
@@ -225,82 +149,22 @@ export default function GeminiChatScreen() {
 
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#FDF7F8' },
-    header: { 
-        flexDirection: 'row', 
-        backgroundColor: '#FF8FA3', 
-        paddingVertical: 15, 
-        paddingHorizontal: 10,
-        alignItems: 'center', 
-        justifyContent: 'space-between',
-        elevation: 4
-    },
-    backBtn: { width: 40, alignItems: 'center' },
-    headerTitleRow: { flexDirection: 'row', alignItems: 'center' },
-    headerTitle: { color: 'white', fontSize: 18, fontWeight: 'bold', marginLeft: 8 },
-    
-    listContent: { padding: 15, paddingBottom: 20 },
-    bubbleContainer: { marginBottom: 18, width: '100%' },
-    bubble: { 
-        padding: 14, 
-        borderRadius: 20, 
-        maxWidth: '82%',
-        elevation: 1,
-        shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.05, shadowRadius: 2
-    },
-    userBubble: { backgroundColor: '#FF8FA3', borderBottomRightRadius: 4 },
-    aiBubble: { 
-        backgroundColor: '#FFF', 
-        borderBottomLeftRadius: 4, 
-        borderWidth: 1, 
-        borderColor: '#FFE4E9' 
-    },
+    header: { flexDirection: 'row', backgroundColor: '#FF8FA3', padding: 15, alignItems: 'center', justifyContent: 'space-between' },
+    headerTitle: { color: 'white', fontSize: 18, fontWeight: 'bold' },
+    backBtn: { width: 40 },
+    bubbleContainer: { marginBottom: 15, width: '100%' },
+    bubble: { padding: 12, borderRadius: 20, maxWidth: '85%', elevation: 1 },
     bubbleText: { fontSize: 15, lineHeight: 22 },
-
-    // PRODUCT CARD STYLES
-    productCard: {
-        backgroundColor: '#FFF',
-        borderRadius: 18,
-        width: 230,
-        marginTop: 10,
-        marginLeft: 5,
-        borderWidth: 1,
-        borderColor: '#FFE4E9',
-        overflow: 'hidden',
-        elevation: 5,
-        shadowColor: '#FF8FA3', shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2, shadowRadius: 6,
-    },
-    imageWrapper: { position: 'relative', width: '100%', height: 140 },
-    productImage: { width: '100%', height: '100%', resizeMode: 'cover' },
-    badge: {
-        position: 'absolute', top: 8, left: 8,
-        backgroundColor: 'rgba(255, 143, 163, 0.9)',
-        paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8
-    },
-    badgeText: { color: 'white', fontSize: 10, fontWeight: 'bold' },
-    productInfo: { padding: 12 },
-    productName: { fontSize: 14, fontWeight: '700', color: '#333' },
-    productPrice: { fontSize: 16, color: '#FF4D6D', fontWeight: 'bold', marginVertical: 6 },
-    detailBtn: { 
-        flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-        backgroundColor: '#FFF0F3', paddingVertical: 8, borderRadius: 10, marginTop: 4
-    },
-    detailBtnText: { color: '#FF8FA3', fontSize: 12, fontWeight: 'bold', marginRight: 4 },
-
-    loadingContainer: { flexDirection: 'row', marginLeft: 20, marginBottom: 15, alignItems: 'center' },
-    loadingText: { color: '#FF8FA3', marginLeft: 8, fontSize: 13, fontWeight: '600' },
-
-    inputArea: { 
-        flexDirection: 'row', padding: 12, backgroundColor: '#FFF', 
-        borderTopWidth: 1, borderColor: '#EEE', alignItems: 'center'
-    },
-    input: { 
-        flex: 1, backgroundColor: '#F1F3F4', borderRadius: 25, 
-        paddingHorizontal: 18, height: 46, fontSize: 15, color: '#333'
-    },
-    sendBtn: { 
-        backgroundColor: '#FF8FA3', width: 46, height: 46, borderRadius: 23, 
-        justifyContent: 'center', alignItems: 'center', marginLeft: 10 
-    }
+    userBubble: { backgroundColor: '#FF8FA3', borderBottomRightRadius: 2 },
+    aiBubble: { backgroundColor: '#FFF', borderBottomLeftRadius: 2, borderWidth: 1, borderColor: '#FFE4E9' },
+    productCard: { backgroundColor: '#FFF', borderRadius: 12, width: 150, marginRight: 12, elevation: 3, overflow: 'hidden', borderWidth: 1, borderColor: '#FFE4E9' },
+    productImage: { width: '100%', height: 110, resizeMode: 'cover' },
+    productInfo: { padding: 8 },
+    productName: { fontSize: 13, fontWeight: '600' },
+    productPrice: { color: '#FF4D6D', fontSize: 14, fontWeight: 'bold', marginTop: 2 },
+    loadingContainer: { flexDirection: 'row', marginLeft: 20, marginBottom: 10, alignItems: 'center' },
+    loadingText: { color: '#FF8FA3', marginLeft: 8, fontSize: 13 },
+    inputArea: { flexDirection: 'row', padding: 10, backgroundColor: '#FFF', borderTopWidth: 1, borderColor: '#EEE', alignItems: 'center' },
+    input: { flex: 1, backgroundColor: '#F1F3F4', borderRadius: 20, paddingHorizontal: 15, height: 40 },
+    sendBtn: { backgroundColor: '#FF8FA3', width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center', marginLeft: 10 }
 });

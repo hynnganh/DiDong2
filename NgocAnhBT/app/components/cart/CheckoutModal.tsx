@@ -1,14 +1,14 @@
 import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
-  ActivityIndicator,
-  Alert,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View
+    ActivityIndicator,
+    Alert,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
 } from 'react-native';
 
 const COLORS = {
@@ -48,7 +48,7 @@ export default function CheckoutModal({ totalCost, loading, onPlaceOrder }: any)
 
   const handleConfirm = () => {
     if (address.trim().length < 5) {
-      Alert.alert('Nàng ơi!', 'Hãy nhập địa chỉ chi tiết hơn nhé! 🎀');
+      Alert.alert('bạn ơi!', 'Hãy nhập địa chỉ chi tiết hơn nhé! 🎀');
       return;
     }
     onPlaceOrder({ 

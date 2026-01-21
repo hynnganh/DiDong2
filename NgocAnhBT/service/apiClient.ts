@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios, { InternalAxiosRequestConfig } from 'axios';
 
 /* ====== CHỈ SỬA IP Ở ĐÂY ====== */
-export const API_HOST = 'http://192.168.1.243:8080';
+export const API_HOST = 'http://172.20.10.3:8080';
 
 /* ====== CÁC ĐƯỜNG DẪN CHUẨN ====== */
 export const API_BASE = `${API_HOST}/api`;

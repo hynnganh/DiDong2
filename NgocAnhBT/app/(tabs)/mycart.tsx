@@ -2,28 +2,29 @@ import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-  ActivityIndicator,
-  Alert,
-  FlatList,
-  Modal,
-  SafeAreaView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
+    ActivityIndicator,
+    Alert,
+    FlatList,
+    Modal,
+    SafeAreaView,
+    StatusBar,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
 } from 'react-native';
 import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
 import Animated, { FadeInRight, FadeOutLeft, Layout } from 'react-native-reanimated';
 
 // Import từ Service
 import {
-  CLEAR_CART_API // Nàng hãy đảm bảo hàm này dùng apiClient.delete
-  ,
-  DELETE_CART_ITEM,
-  GET_CART,
-  placeOrderApi,
-  UPDATE_CART_QUANTITY
+    CLEAR_CART_API // bạn hãy đảm bảo hàm này dùng apiClient.delete
+    ,
+
+    DELETE_CART_ITEM,
+    GET_CART,
+    placeOrderApi,
+    UPDATE_CART_QUANTITY
 } from '../../service/APIService';
 import { getCartIdFromToken, getUserInfoFromToken } from '../../service/UserService';
 
@@ -212,7 +213,7 @@ export default function MyCart() {
         <StatusBar barStyle="dark-content" />
         <View style={styles.container}>
           <View style={styles.header}>
-            <Text style={styles.headerTitle}>Túi xách của nàng</Text>
+            <Text style={styles.headerTitle}>Túi xách của bạn</Text>
             <View style={styles.headerLine} />
           </View>
 
@@ -223,7 +224,7 @@ export default function MyCart() {
           ) : cartItems.length === 0 ? (
             <View style={styles.centered}>
               <MaterialCommunityIcons name="shopping-outline" size={80} color="#F5F5F5" />
-              <Text style={styles.emptyText}>Giỏ hàng đang chờ nàng đó!</Text>
+              <Text style={styles.emptyText}>Giỏ hàng đang chờ bạn đó!</Text>
               <TouchableOpacity style={styles.shopBtn} onPress={() => router.replace('/')}>
                 <Text style={styles.shopBtnText}>ĐI MUA SẮM NGAY</Text>
               </TouchableOpacity>

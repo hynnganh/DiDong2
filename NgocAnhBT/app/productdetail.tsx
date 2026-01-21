@@ -135,7 +135,7 @@ export default function ProductDetail() {
                 style={[styles.favBtn, isFavorite && styles.favBtnActive]} 
                 onPress={() => setIsFavorite(!isFavorite)}
               >
-                <AntDesign name={(isFavorite ? "heart" : "hearto") as any} size={22} color={isFavorite ? "#FFF" : "#FF8FA3"} />
+                <AntDesign name={(isFavorite ? "heart" : "heart") as any} size={22} color={isFavorite ? "#FFF" : "#FF8FA3"} />
               </TouchableOpacity>
             </View>
             <Text style={styles.unitText}>{product.unitWeight || "Chính hãng • 100% Organic"}</Text>

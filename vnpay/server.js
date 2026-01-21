@@ -1,7 +1,7 @@
-const express = require("express");
-const cors = require("cors");
-const crypto = require("crypto");
-const moment = require("moment");
+import express from "express";
+import cors from "cors";
+import crypto from "crypto";
+import moment from "moment";
 
 const app = express();
 app.use(cors());
@@ -9,18 +9,17 @@ app.use(express.json());
 
 const PORT = 3000;
 const SERVER_IP = "172.20.10.3"; // IP máy tính của nàng
-
 const vnp_TmnCode = "5KKPWZ0N"; 
 const vnp_HashSecret = "QZF9BDG3EG6JO4ZKUWB2H2TBWXLL9K5H";
 const vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
 
-// THAY ĐỔI: Trỏ về API của Server thay vì trỏ thẳng về App localhost:8081
+// URL này để VNPay gọi lại server
 const vnp_ReturnUrl = `http://${SERVER_IP}:${PORT}/vnpay_return`;
 
 app.get("/payment", (req, res) => {
     let date = new Date();
     let createDate = moment(date).format('YYYYMMDDHHmmss');
-    let ipAddr = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    let ipAddr = req.headers['x-forwarded-for'] || req.socket.remoteAddress || "127.0.0.1";
     let amount = req.query.amount ? parseInt(req.query.amount.toString()) : 10000;
 
     let vnp_Params = {
@@ -53,10 +52,13 @@ app.get("/payment", (req, res) => {
 app.get("/vnpay_return", (req, res) => {
     const responseCode = req.query.vnp_ResponseCode;
     const isSuccess = responseCode === "00";
+    const targetPath = isSuccess ? "payment" : "mycart"; 
 
-    // ĐIỀU HƯỚNG: Nếu lỗi/hủy -> về 'cart', nếu thành công -> về 'payment' để xác nhận
-    const targetPath = isSuccess ? "payment" : "cart";
-    const deepLink = `shopmyphamngocanh://${targetPath}?vnp_ResponseCode=${responseCode}`;
+    // DÙNG HTTP CHO TẤT CẢ:
+    // Trên Laptop: localhost:8081
+    // Trên Điện thoại: SERVER_IP:8081 (đảm bảo đt và máy tính cùng Wi-Fi)
+    const laptopLink = `http://localhost:8081/${targetPath}?vnp_ResponseCode=${responseCode}`;
+    const mobileWebLink = `http://${SERVER_IP}:8081/${targetPath}?vnp_ResponseCode=${responseCode}`;
 
     res.send(`
       <!DOCTYPE html>
@@ -69,7 +71,7 @@ app.get("/vnpay_return", (req, res) => {
               .icon { font-size: 60px; color: ${isSuccess ? '#EABFBB' : '#FF7675'}; margin-bottom: 20px; display: block; }
               h1 { color: #4A4A4A; font-size: 18px; margin-bottom: 10px; }
               p { color: #8E8E8E; font-size: 13px; line-height: 1.5; }
-              .loader { border: 3px solid #f3f3f3; border-top: 3px solid #EABFBB; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; margin-top: 20px; }
+              .loader { border: 3px solid #f3f3f3; border-top: 3px solid #EABFBB; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; margin: 20px auto 0; }
               @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
           </style>
       </head>
@@ -77,11 +79,16 @@ app.get("/vnpay_return", (req, res) => {
           <div class="card">
               <span class="icon">${isSuccess ? '♥' : '✕'}</span>
               <h1>${isSuccess ? 'Thanh toán thành công' : 'Thanh toán đã hủy'}</h1>
-              <p>${isSuccess ? 'Đang quay lại App để tạo đơn hàng...' : 'Nàng đã hủy giao dịch. Đang quay lại túi xách...'}</p>
-              <center><div class="loader"></div></center>
+              <p>Đang quay lại cửa hàng mỹ phẩm...</p>
+              <div class="loader"></div>
           </div>
           <script>
-              setTimeout(() => { window.location.href = '${deepLink}'; }, 2500);
+              const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+              const finalLink = isMobile ? "${mobileWebLink}" : "${laptopLink}";
+              
+              setTimeout(() => {
+                  window.location.href = finalLink;
+              }, 2000);
           </script>
       </body>
       </html>

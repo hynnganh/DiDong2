@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-end",
-    marginHorizontal: 20,
+    marginHorizontal:5,
     marginBottom: 15,
   },
   sectionTitle: { 
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     fontWeight: "600" 
   },
   scrollContent: {
-    paddingLeft: 20,
+    paddingLeft: 10,
     paddingRight: 10,
   },
   categoryBox: {

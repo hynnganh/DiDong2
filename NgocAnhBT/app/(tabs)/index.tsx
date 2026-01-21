@@ -111,10 +111,10 @@ export default function HomeScreen() {
         {/* --- HEADER --- */}
         <Animated.View entering={FadeInUp.delay(100)} style={styles.header}>
           <View style={styles.headerLeft}>
-            <Text style={styles.brandName}>BEAUTY <Text style={{fontWeight: '300'}}>GLOW</Text></Text>
+            <Text style={styles.brandName}>NGỌC ÁNH</Text>
             <View style={styles.locationRow}>
               <Feather name="map-pin" size={14} color="#FF8FA3" />
-              <Text style={styles.locationText}>Luxury Cosmetics</Text>
+              <Text style={styles.locationText}>Mỹ Phẩm Chất Lượng</Text>
             </View>
           </View>
           <View style={styles.headerIcons}>
@@ -229,10 +229,15 @@ export default function HomeScreen() {
                 </View>
               </View>
 
-              <ProductHome title="✨ Sản Phẩm Mới Về" products={exclusiveOffers} />
-              <ProductHome title="💖 Bán Chạy Nhất" products={bestSelling} />
-              <CategoryHome />
-              <ProductHome title="💄 Bộ Sưu Tập Makeup" products={makeupProducts} />
+              <View style={styles.contentContainer1}>
+    <ProductHome title="✨ Sản Phẩm Mới Về" products={exclusiveOffers} />
+    <ProductHome title="💖 Bán Chạy Nhất" products={bestSelling} />
+    
+    {/* Category có thể để tràn viền hoặc nằm trong lề tùy sở thích */}
+    <CategoryHome /> 
+    
+    <ProductHome title="💄 Bộ Sưu Tập Makeup" products={makeupProducts} />
+  </View>
             </Animated.View>
           ) : (
             <Animated.View entering={FadeInUp} style={styles.noResultBox}>
@@ -242,7 +247,6 @@ export default function HomeScreen() {
             </Animated.View>
           )}
         </View>
-        <View style={{ height: 100 }} />
       </ScrollView>
     </View>
   );
@@ -250,7 +254,7 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FCFCFC' },
-  header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingTop: 60, paddingBottom: 15, backgroundColor: '#FFF' },
+  header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingTop:20, paddingBottom: 15, backgroundColor: '#FFF' },
   headerLeft: { flex: 1 },
   brandName: { fontSize: 22, fontWeight: 'bold', letterSpacing: 2, color: '#181725' },
   locationRow: { flexDirection: 'row', alignItems: 'center', marginTop: 2 },
@@ -284,6 +288,7 @@ const styles = StyleSheet.create({
   clearButton: { backgroundColor: '#BBB', width: 20, height: 20, borderRadius: 10, justifyContent: 'center', alignItems: 'center' },
 
   contentContainer: { flex: 1 },
+  contentContainer1: {   paddingHorizontal: 16, },
   bannerWrapper: { width: width, paddingHorizontal: 20, height: 210 },
   bannerImage: { width: BANNER_WIDTH, height: '100%', borderRadius: 25 },
   bannerOverlay: { position: 'absolute', left: 40, top: 35 },

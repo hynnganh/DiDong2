@@ -102,7 +102,7 @@ export default function OrderAcceptedScreen() {
                     </Animated.View>
 
                     <Animated.Text entering={FadeInUp.delay(700)} style={styles.description}>
-                        Báu vật của nàng đang được chuẩn bị và sẽ sớm được giao tới tận tay. Đừng quên theo dõi trạng thái đơn hàng nhé! 🌸
+                        Báu vật của bạn đang được chuẩn bị và sẽ sớm được giao tới tận tay. Đừng quên theo dõi trạng thái đơn hàng nhé! 🌸
                     </Animated.Text>
                 </View>
 

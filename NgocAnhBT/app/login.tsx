@@ -2,27 +2,27 @@ import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-    ActivityIndicator,
-    Alert,
-    Dimensions,
-    KeyboardAvoidingView,
-    Platform,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  Dimensions,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import Animated, {
-    FadeInDown,
-    FadeInUp,
-    useAnimatedStyle,
-    useSharedValue,
-    withSequence,
-    withSpring,
-    withTiming,
+  FadeInDown,
+  FadeInUp,
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withSpring,
+  withTiming,
 } from 'react-native-reanimated';
 import { POST_LOGIN } from '../service/APIService';
 
@@ -133,7 +133,7 @@ export default function ModernLogin() {
             <View style={styles.logoCircle}>
                <MaterialCommunityIcons name="butterfly-outline" size={40} color="#fff" />
             </View>
-            <Text style={styles.welcomeText}>Chào bạn thơ!</Text>
+            <Text style={styles.welcomeText}>Chào bạn yêu!</Text>
             <Text style={styles.subtitleText}>Đăng nhập để cùng làm đẹp mỗi ngày</Text>
           </Animated.View>
 

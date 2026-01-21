@@ -142,14 +142,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginHorizontal: 20,
     marginBottom: 18,
   },
   titleLine: { flexDirection: 'row', alignItems: 'center' },
   verticalLine: { width: 4, height: 18, backgroundColor: '#FF8FA3', borderRadius: 2, marginRight: 8 },
   sectionTitle: { fontSize: 18, fontWeight: '800', color: '#181725', letterSpacing: -0.5 },
   seeAll: { color: '#7C7C7C', fontSize: 13, fontWeight: '600' },
-  scrollPadding: { paddingLeft: 20, paddingRight: 5 },
+  scrollPadding: { paddingLeft: 5, paddingRight: 5 },
 
   productCard: {
     width: width * 0.45,
